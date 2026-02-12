@@ -1,4 +1,5 @@
 service: crud-tires
+frameworkVersion: '3'
 
 provider:
   name: aws
