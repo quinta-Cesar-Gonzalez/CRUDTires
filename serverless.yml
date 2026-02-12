@@ -57,3 +57,12 @@ package:
     - 'main.py'
     - 'database.py'
     - 'models.py'
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: false
+    slim: true
+    strip: false
