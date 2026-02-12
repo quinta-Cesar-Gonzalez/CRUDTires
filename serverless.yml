@@ -3,7 +3,7 @@ service: crud-tires
 provider:
   name: aws
   runtime: nodejs18.x
-  region: us-east-1  # Cambiado a us-east-1 para estar en la misma región que RDS
+  region: us-west-1  # Lambda en us-west-1, RDS en us-east-1 (cross-region)
   stage: ${opt:stage, 'dev'}
   environment:
     MYSQL_URI: ${env:MYSQL_URI}
