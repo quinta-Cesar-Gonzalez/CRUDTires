@@ -20,15 +20,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "mysql2": "^3.6.5",
-    "serverless-http": "^3.2.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "serverless-http": "^3.2.0"
   },
   "devDependencies": {
     "archiver": "^6.0.1",
-    "serverless": "^3.38.0",
-    "serverless-offline": "^13.3.0"
+    "serverless": "^3.40.0",
+    "serverless-offline": "^13.9.0"
   }
 }
