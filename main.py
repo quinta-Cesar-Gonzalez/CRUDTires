@@ -146,7 +146,7 @@ async def create_tire(tire: TireCreate):
             tire.brand, tire.model, tire.size, tire.layer_index, tire.layers,
             tire.max_pressure, tire.min_pressure, tire.max_depth, tire.min_depth,
             tire.wear_type, tire.profitability, tire.performance, tire.temperature,
-            tire.speed, tire.speed_number, tire.braking, tire.load_type, tire._load,
+            tire.speed, tire.speed_number, tire.braking, tire.load_type, tire.load_value,
             tire.road_type, tire.terrain_type, tire.position
         )
         
@@ -185,7 +185,7 @@ async def update_tire(tire_id: int, tire: TireUpdate):
             tire.brand, tire.model, tire.size, tire.layer_index, tire.layers,
             tire.max_pressure, tire.min_pressure, tire.max_depth, tire.min_depth,
             tire.wear_type, tire.profitability, tire.performance, tire.temperature,
-            tire.speed, tire.speed_number, tire.braking, tire.load_type, tire._load,
+            tire.speed, tire.speed_number, tire.braking, tire.load_type, tire.load_value,
             tire.road_type, tire.terrain_type, tire.position,
             tire_id
         )

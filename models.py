@@ -21,7 +21,7 @@ class TireBase(BaseModel):
     speed_number: Optional[int] = Field(0, ge=0)
     braking: Optional[str] = Field(None, max_length=50)
     load_type: Optional[str] = Field(None, max_length=50)
-    _load: Optional[int] = Field(0, ge=0, alias='load')
+    load_value: Optional[int] = Field(0, ge=0, serialization_alias='_load')
     road_type: Optional[str] = Field(None, max_length=50)
     terrain_type: Optional[str] = Field(None, max_length=50)
     position: Optional[str] = Field(None, max_length=50)
