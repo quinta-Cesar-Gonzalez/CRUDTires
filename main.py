@@ -3,8 +3,6 @@ import math
 from typing import Optional
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import HTMLResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
@@ -252,18 +250,6 @@ async def get_filters():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@app.get("/", response_class=HTMLResponse)
-async def serve_frontend():
-    """Serve the frontend HTML."""
-    try:
-        html_path = os.path.join(os.path.dirname(__file__), "public", "index.html")
-        with open(html_path, 'r', encoding='utf-8') as f:
-            return HTMLResponse(content=f.read())
-    except FileNotFoundError:
-        return HTMLResponse(content="<h1>Frontend not found</h1>", status_code=404)
-    except Exception as e:
-        return HTMLResponse(content=f"<h1>Error: {str(e)}</h1>", status_code=500)
 
 
 # Lambda handler
