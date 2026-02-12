@@ -1,16 +1,16 @@
 require('dotenv').config();
 const mysql = require('mysql2/promise');
 
-// Parse MySQL URI
+// Parse MySQL URI t
 function parseDbUri(uri) {
   // Format: mysql+mysqlconnector://user:pass@host:port/database
   const regex = /mysql\+mysqlconnector:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/;
   const match = uri.match(regex);
-  
+
   if (!match) {
     throw new Error('Invalid MySQL URI format');
   }
-  
+
   return {
     user: match[1],
     password: match[2],
