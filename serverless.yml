@@ -1,4 +1,4 @@
-service: crud-tires
+service: crud-tires-py
 frameworkVersion: '3'
 
 provider:
