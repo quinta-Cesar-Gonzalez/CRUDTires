@@ -39,6 +39,15 @@ functions:
               - Authorization
               - X-Api-Key
               - X-Amz-Security-Token
+  
+  test:
+    handler: test-lambda.handler
+    description: Test database connection and environment
+    events:
+      - http:
+          path: /test
+          method: GET
+          cors: true
 
 # Package configuration
 package:
@@ -54,6 +63,7 @@ package:
     - 'public/**'
     - 'index.js'
     - 'database.js'
+    - 'test-lambda.js'
     - 'package.json'
 
 plugins:
