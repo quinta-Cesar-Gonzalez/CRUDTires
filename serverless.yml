@@ -1,0 +1,64 @@
+service: crud-tires
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-west-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    MYSQL_URI: ${env:MYSQL_URI}
+  # Lambda configuration optimizada
+  memorySize: 512
+  timeout: 30
+
+functions:
+  api:
+    handler: index.handler
+    description: CRUD API for Tires Catalog
+    events:
+      # Catch-all proxy para todas las rutas
+      - http:
+          path: /
+          method: ANY
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+
+# Package configuration
+package:
+  excludeDevDependencies: true
+  patterns:
+    - '!.git/**'
+    - '!.env*'
+    - '!node_modules.zip'
+    - '!lambda-deployment.zip'
+    - '!lambda-package/**'
+    - '!.github/**'
+    - '!*.md'
+    - 'public/**'
+    - 'index.js'
+    - 'database.js'
+    - 'package.json'
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3000

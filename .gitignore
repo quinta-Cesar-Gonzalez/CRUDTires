@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.local
+*.log
+lambda-deployment.zip
+lambda-package/
+.DS_Store
+dist/
+build/
+
+# Serverless
+.serverless/
+*.zip

@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD - Catálogo de Llantas</title>
+    <meta name="description" content="Sistema de gestión de catálogo de llantas con operaciones CRUD completas">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #12182b;
+            --bg-card: rgba(20, 28, 50, 0.7);
+            --accent-1: #6366f1;
+            --accent-2: #8b5cf6;
+            --accent-3: #ec4899;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            background: var(--bg-card);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            flex: 2;
+        }
+
+        select {
+            padding: 0.875rem 1.25rem;
+            background: var(--bg-card);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            min-width: 150px;
+        }
+
+        select:hover {
+            border-color: var(--accent-2);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent-2);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--error), #dc2626);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 2px solid var(--text-muted);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(99, 102, 241, 0.1);
+            transform: scale(1.01);
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.4s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.75rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 0.875rem;
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+        }
+
+        .required::after {
+            content: ' *';
+            color: var(--error);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .pagination button {
+            min-width: 40px;
+            height: 40px;
+        }
+
+        .page-info {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            border: 3px solid rgba(99, 102, 241, 0.1);
+            border-top: 3px solid var(--accent-1);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, var(--error), #dc2626);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏁 Catálogo de Llantas</h1>
+            <p class="subtitle">Sistema de Gestión CRUD</p>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Buscar por marca, modelo o tamaño...">
+            </div>
+            <div class="filter-group">
+                <select id="brandFilter">
+                    <option value="">Todas las Marcas</option>
+                </select>
+                <select id="modelFilter">
+                    <option value="">Todos los Modelos</option>
+                </select>
+                <select id="sizeFilter">
+                    <option value="">Todos los Tamaños</option>
+                </select>
+                <select id="positionFilter">
+                    <option value="">Todas las Posiciones</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="openCreateModal()">
+                ➕ Nueva Llanta
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Tamaño</th>
+                        <th>Posición</th>
+                        <th>Capas</th>
+                        <th>Presión (Max)</th>
+                        <th>Profundidad (Max)</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tireTableBody">
+                    <tr>
+                        <td colspan="9" class="loading">
+                            <div class="spinner"></div>
+                            Cargando datos...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            <button class="btn btn-secondary btn-sm" id="prevPage" onclick="changePage(-1)">
+                ← Anterior
+            </button>
+            <span class="page-info" id="pageInfo">Página 1 de 1</span>
+            <button class="btn btn-secondary btn-sm" id="nextPage" onclick="changePage(1)">
+                Siguiente →
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal for Create/Edit -->
+    <div class="modal" id="tireModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nueva Llanta</h2>
+            </div>
+            <form id="tireForm">
+                <input type="hidden" id="tireId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="required">Marca</label>
+                        <input type="text" id="brand" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Modelo</label>
+                        <input type="text" id="model" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Tamaño</label>
+                        <input type="text" id="size" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Posición</label>
+                        <select id="position">
+                            <option value="">Seleccionar</option>
+                            <option value="DRAG">DRAG</option>
+                            <option value="STEERING">STEERING</option>
+                            <option value="TRACTION">TRACTION</option>
+                            <option value="TRUCK">TRUCK</option>
+                            <option value="ALL">ALL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Índice de Capa</label>
+                        <input type="text" id="layer_index">
+                    </div>
+                    <div class="form-group">
+                        <label>Capas</label>
+                        <input type="number" id="layers" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Presión Máxima</label>
+                        <input type="number" id="max_pressure" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Presión Mínima</label>
+                        <input type="number" id="min_pressure" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Profundidad Máxima</label>
+                        <input type="number" step="0.1" id="max_depth" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Profundidad Mínima</label>
+                        <input type="number" id="min_depth" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Desgaste</label>
+                        <input type="text" id="wear_type">
+                    </div>
+                    <div class="form-group">
+                        <label>Rentabilidad</label>
+                        <input type="number" id="profitability" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Rendimiento</label>
+                        <input type="number" id="performance" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Temperatura</label>
+                        <input type="text" id="temperature">
+                    </div>
+                    <div class="form-group">
+                        <label>Velocidad</label>
+                        <input type="text" id="speed">
+                    </div>
+                    <div class="form-group">
+                        <label>Número de Velocidad</label>
+                        <input type="number" id="speed_number" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Frenado</label>
+                        <input type="text" id="braking">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Carga</label>
+                        <input type="text" id="load_type">
+                    </div>
+                    <div class="form-group">
+                        <label>Carga</label>
+                        <input type="number" id="_load" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Carretera</label>
+                        <input type="text" id="road_type">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Terreno</label>
+                        <input type="text" id="terrain_type">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        💾 Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        let currentPage = 1;
+        let totalPages = 1;
+        let searchTimeout = null;
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFilters();
+            loadTires();
+
+            // Search with debounce
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentPage = 1;
+                    loadTires();
+                }, 300);
+            });
+
+            // Filter change handlers
+            ['brandFilter', 'modelFilter', 'sizeFilter', 'positionFilter'].forEach(id => {
+                document.getElementById(id).addEventListener('change', () => {
+                    currentPage = 1;
+                    loadTires();
+                });
+            });
+
+            // Form submit
+            document.getElementById('tireForm').addEventListener('submit', handleFormSubmit);
+        });
+
+        async function loadFilters() {
+            try {
+                const response = await fetch(`${API_BASE}/api/filters`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    populateFilter('brandFilter', result.data.brands);
+                    populateFilter('modelFilter', result.data.models);
+                    populateFilter('sizeFilter', result.data.sizes);
+                    populateFilter('positionFilter', result.data.positions);
+                }
+            } catch (error) {
+                console.error('Error loading filters:', error);
+            }
+        }
+
+        function populateFilter(filterId, options) {
+            const select = document.getElementById(filterId);
+            const currentValue = select.value;
+            const defaultOption = select.querySelector('option[value=""]');
+            
+            select.innerHTML = '';
+            select.appendChild(defaultOption);
+            
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                select.appendChild(opt);
+            });
+            
+            select.value = currentValue;
+        }
+
+        async function loadTires() {
+            const search = document.getElementById('searchInput').value;
+            const brand = document.getElementById('brandFilter').value;
+            const model = document.getElementById('modelFilter').value;
+            const size = document.getElementById('sizeFilter').value;
+            const position = document.getElementById('positionFilter').value;
+
+            const params = new URLSearchParams({
+                page: currentPage,
+                limit: 20,
+                ...(search && { search }),
+                ...(brand && { brand }),
+                ...(model && { model }),
+                ...(size && { size }),
+                ...(position && { position })
+            });
+
+            try {
+                const response = await fetch(`${API_BASE}/api/tires?${params}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    displayTires(result.data);
+                    updatePagination(result.pagination);
+                } else {
+                    showNotification('Error al cargar datos', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading tires:', error);
+                showNotification('Error de conexión', 'error');
+            }
+        }
+
+        function displayTires(tires) {
+            const tbody = document.getElementById('tireTableBody');
+            
+            if (tires.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-muted);">No se encontraron resultados</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = tires.map(tire => `
+                <tr>
+                    <td>${tire.id}</td>
+                    <td>${tire.brand}</td>
+                    <td>${tire.model}</td>
+                    <td>${tire.size}</td>
+                    <td>${tire.position || '-'}</td>
+                    <td>${tire.layers}</td>
+                    <td>${tire.max_pressure}</td>
+                    <td>${tire.max_depth}</td>
+                    <td class="actions">
+                        <button class="btn btn-primary btn-sm" onclick='editTire(${JSON.stringify(tire)})'>
+                            ✏️ Editar
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteTire(${tire.id})">
+                            🗑️ Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updatePagination(pagination) {
+            currentPage = pagination.page;
+            totalPages = pagination.totalPages;
+            
+            document.getElementById('pageInfo').textContent = 
+                `Página ${pagination.page} de ${pagination.totalPages} (${pagination.total} registros)`;
+            
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+        }
+
+        function changePage(delta) {
+            const newPage = currentPage + delta;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                loadTires();
+            }
+        }
+
+        function openCreateModal() {
+            document.getElementById('modalTitle').textContent = 'Nueva Llanta';
+            document.getElementById('tireForm').reset();
+            document.getElementById('tireId').value = '';
+            document.getElementById('tireModal').classList.add('active');
+        }
+
+        function editTire(tire) {
+            document.getElementById('modalTitle').textContent = 'Editar Llanta';
+            document.getElementById('tireId').value = tire.id;
+            
+            // Populate form fields
+            Object.keys(tire).forEach(key => {
+                const field = document.getElementById(key);
+                if (field) {
+                    field.value = tire[key] !== null ? tire[key] : '';
+                }
+            });
+            
+            document.getElementById('tireModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('tireModal').classList.remove('active');
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const tireId = document.getElementById('tireId').value;
+            const formData = {
+                brand: document.getElementById('brand').value,
+                model: document.getElementById('model').value,
+                size: document.getElementById('size').value,
+                position: document.getElementById('position').value || null,
+                layer_index: document.getElementById('layer_index').value,
+                layers: parseInt(document.getElementById('layers').value) || 0,
+                max_pressure: parseInt(document.getElementById('max_pressure').value) || 0,
+                min_pressure: parseInt(document.getElementById('min_pressure').value) || 0,
+                max_depth: parseFloat(document.getElementById('max_depth').value) || 0,
+                min_depth: parseInt(document.getElementById('min_depth').value) || 0,
+                wear_type: document.getElementById('wear_type').value || null,
+                profitability: parseInt(document.getElementById('profitability').value) || 0,
+                performance: parseInt(document.getElementById('performance').value) || 0,
+                temperature: document.getElementById('temperature').value,
+                speed: document.getElementById('speed').value,
+                speed_number: parseInt(document.getElementById('speed_number').value) || 0,
+                braking: document.getElementById('braking').value,
+                load_type: document.getElementById('load_type').value,
+                _load: parseInt(document.getElementById('_load').value) || 0,
+                road_type: document.getElementById('road_type').value,
+                terrain_type: document.getElementById('terrain_type').value
+            };
+
+            try {
+                const url = tireId 
+                    ? `${API_BASE}/api/tires/${tireId}`
+                    : `${API_BASE}/api/tires`;
+                
+                const method = tireId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification(result.message || 'Operación exitosa', 'success');
+                    closeModal();
+                    loadTires();
+                    loadFilters();
+                } else {
+                    showNotification(result.error || 'Error en la operación', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving tire:', error);
+                showNotification('Error de conexión', 'error');
+            }
+        }
+
+        async function deleteTire(id) {
+            if (!confirm('¿Está seguro de eliminar esta llanta?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/tires/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification('Llanta eliminada exitosamente', 'success');
+                    loadTires();
+                    loadFilters();
+                } else {
+                    showNotification(result.error || 'Error al eliminar', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting tire:', error);
+                showNotification('Error de conexión', 'error');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Close modal on outside click
+        document.getElementById('tireModal').addEventListener('click', (e) => {
+            if (e.target.id === 'tireModal') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
