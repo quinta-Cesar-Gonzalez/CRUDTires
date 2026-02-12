@@ -9,6 +9,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      MYSQL_URI: ${{ secrets.MYSQL_URI }}
     
     steps:
     - name: Checkout code
@@ -31,8 +33,6 @@ jobs:
         aws-region: us-west-1
 
     - name: Deploy to AWS Lambda
-      env:
-        MYSQL_URI: ${{ secrets.MYSQL_URI }}
       run: npx serverless deploy --verbose
 
     - name: Display endpoints
