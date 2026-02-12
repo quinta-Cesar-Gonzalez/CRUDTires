@@ -2,8 +2,8 @@ service: crud-tires
 
 provider:
   name: aws
-  runtime: nodejs18.x
-  region: us-west-1  # Lambda en us-west-1, RDS en us-east-1 (cross-region)
+  runtime: python3.11  # Changed from nodejs18.x
+  region: us-west-1
   stage: ${opt:stage, 'dev'}
   environment:
     MYSQL_URI: ${env:MYSQL_URI}
@@ -13,8 +13,8 @@ provider:
 
 functions:
   api:
-    handler: index.handler
-    description: CRUD API for Tires Catalog
+    handler: main.handler  # Changed from index.handler
+    description: CRUD API for Tires Catalog (FastAPI)
     events:
       # Catch-all proxy para todas las rutas
       - http:
@@ -39,36 +39,20 @@ functions:
               - Authorization
               - X-Api-Key
               - X-Amz-Security-Token
-  
-  test:
-    handler: test-lambda.handler
-    description: Test database connection and environment
-    events:
-      - http:
-          path: /test
-          method: GET
-          cors: true
 
 # Package configuration
 package:
-  excludeDevDependencies: true
   patterns:
+    - '!node_modules/**'
     - '!.git/**'
     - '!.env*'
-    - '!node_modules.zip'
-    - '!lambda-deployment.zip'
-    - '!lambda-package/**'
+    - '!*.zip'
     - '!.github/**'
     - '!*.md'
+    - '!__pycache__/**'
+    - '!.venv/**'
+    - '!venv/**'
     - 'public/**'
-    - 'index.js'
-    - 'database.js'
-    - 'test-lambda.js'
-    - 'package.json'
-
-plugins:
-  - serverless-offline
-
-custom:
-  serverless-offline:
-    httpPort: 3000
+    - 'main.py'
+    - 'database.py'
+    - 'models.py'

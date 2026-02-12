@@ -11,3 +11,12 @@ build/
 # Serverless
 .serverless/
 *.zip
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.Python
+.pytest_cache/

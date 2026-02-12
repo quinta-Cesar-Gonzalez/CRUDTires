@@ -1,0 +1,6 @@
+fastapi==0.109.0
+mangum==0.17.0
+pymysql==1.1.0
+pydantic==2.5.3
+python-dotenv==1.0.0
+uvicorn==0.27.0
