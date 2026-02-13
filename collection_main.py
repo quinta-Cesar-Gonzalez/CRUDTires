@@ -1,8 +1,8 @@
 import os
 import math
 import io
-from typing import Optional
-from datetime import date
+from typing import Optional, Tuple
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query, UploadFile, File
@@ -17,17 +17,14 @@ from collection_models import (
 )
 import database as db
 
-# Load environment variables
 load_dotenv()
 
-# Initialize FastAPI
 app = FastAPI(
     title="Collection Management API",
     description="API for managing invoices collection",
     version="1.0.0"
 )
 
-# CORS configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -35,6 +32,60 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def get_period_dates(period: str) -> Tuple[date, date]:
+    """Calculate date range from period string."""
+    today = datetime.now().date()
+    
+    if period == "today":
+        return today, today
+    
+    elif period == "yesterday":
+        yesterday = today - timedelta(days=1)
+        return yesterday, yesterday
+    
+    elif period == "current_week":
+        start = today - timedelta(days=today.weekday())
+        return start, today
+    
+    elif period == "last_week":
+        start = today - timedelta(days=today.weekday() + 7)
+        end = start + timedelta(days=6)
+        return start, end
+    
+    elif period == "current_month":
+        start = today.replace(day=1)
+        return start, today
+    
+    elif period == "last_month":
+        first_current = today.replace(day=1)
+        last_month_end = first_current - timedelta(days=1)
+        last_month_start = last_month_end.replace(day=1)
+        return last_month_start, last_month_end
+    
+    elif period == "last_3_months":
+        end = today
+        start = (today.replace(day=1) - timedelta(days=90)).replace(day=1)
+        return start, end
+    
+    elif period == "last_6_months":
+        end = today
+        start = (today.replace(day=1) - timedelta(days=180)).replace(day=1)
+        return start, end
+    
+    elif period == "current_year":
+        start = today.replace(month=1, day=1)
+        return start, today
+    
+    elif period == "last_year":
+        start = today.replace(year=today.year - 1, month=1, day=1)
+        end = today.replace(year=today.year - 1, month=12, day=31)
+        return start, end
+    
+    else:
+        raise HTTPException(status_code=400, detail=f"Invalid period: {period}")
+
 
 
 @app.get("/api/collection/enums", response_model=EnumsResponse)
@@ -47,7 +98,12 @@ async def get_enums():
                 "spare_parts", "general_service", "tires", "hardware", "training"
             ],
             "statuses": ["pending", "partially_paid", "paid", "overdue", "cancelled"],
-            "branches": ["Q1", "Q2", "QT"]
+            "branches": ["Q1", "Q2", "QT"],
+            "periods": [
+                "today", "yesterday", "current_week", "last_week",
+                "current_month", "last_month", "last_3_months", "last_6_months",
+                "current_year", "last_year"
+            ]
         }
     )
 
@@ -77,16 +133,18 @@ async def list_collections(
     status: Optional[str] = Query(None),
     service: Optional[str] = Query(None),
     branch: Optional[str] = Query(None),
+    period: Optional[str] = Query(None, description="Period filter: today, yesterday, current_week, last_week, current_month, last_month, last_3_months, last_6_months, current_year, last_year"),
     from_date: Optional[date] = Query(None),
     to_date: Optional[date] = Query(None)
 ):
-    """List collections with pagination and filters (excludes soft deleted)."""
     try:
         offset = (page - 1) * limit
         
-        # Build WHERE conditions (always exclude soft deleted)
         where_conditions = ["is_deleted = 0"]
         params = []
+        
+        if period:
+            from_date, to_date = get_period_dates(period)
         
         if company_id:
             where_conditions.append("company_id = %s")
