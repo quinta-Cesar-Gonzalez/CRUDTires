@@ -40,6 +40,23 @@ functions:
               - Authorization
               - X-Api-Key
               - X-Amz-Security-Token
+  
+  collection:
+    handler: collection_main.handler
+    description: Collection Management API (FastAPI)
+    events:
+      - http:
+          path: /api/collection
+          method: ANY
+          cors: true
+      - http:
+          path: /api/collection/{proxy+}
+          method: ANY
+          cors: true
+      - http:
+          path: /api/companies
+          method: GET
+          cors: true
 
 # Package configuration
 package:
@@ -57,6 +74,8 @@ package:
     - 'main.py'
     - 'database.py'
     - 'models.py'
+    - 'collection_main.py'
+    - 'collection_models.py'
 
 plugins:
   - serverless-python-requirements
