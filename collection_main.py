@@ -37,11 +37,8 @@ app.add_middleware(
 )
 
 
-# ===== ENUM ENDPOINTS =====
-
 @app.get("/api/collection/enums", response_model=EnumsResponse)
 async def get_enums():
-    """Get all enum values for dropdowns."""
     return EnumsResponse(
         success=True,
         data={

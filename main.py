@@ -13,17 +13,14 @@ from models import (
 )
 import database as db
 
-# Load environment variables
 load_dotenv()
 
-# Initialize FastAPI
 app = FastAPI(
     title="CRUD Tires Catalog API",
     description="API for managing tires catalog",
     version="1.0.0"
 )
 
-# CORS configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -32,8 +29,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# ===== API ENDPOINTS =====
 
 @app.get("/api/tires", response_model=TireListResponse)
 async def list_tires(
@@ -45,11 +40,9 @@ async def list_tires(
     size: Optional[str] = Query(None),
     position: Optional[str] = Query(None)
 ):
-    """List tires with pagination, search, and filters."""
     try:
         offset = (page - 1) * limit
         
-        # Build WHERE conditions
         where_conditions = []
         params = []
         

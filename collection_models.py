@@ -25,8 +25,8 @@ class CollectionBase(BaseModel):
     service: ServiceEnum
     invoice_date: date
     due_date: date
-    amount: Decimal = Field(..., ge=0, decimal_places=2)
-    amount_paid: Optional[Decimal] = Field(0.00, ge=0, decimal_places=2)
+    amount: Decimal = Field(..., ge=0)
+    amount_paid: Optional[Decimal] = Field(0.00, ge=0)
     status: StatusEnum = 'pending'
     last_partial_payment_date: Optional[date] = None
     branch: BranchEnum
@@ -46,8 +46,8 @@ class CollectionUpdate(BaseModel):
     service: Optional[ServiceEnum] = None
     invoice_date: Optional[date] = None
     due_date: Optional[date] = None
-    amount: Optional[Decimal] = Field(None, ge=0, decimal_places=2)
-    amount_paid: Optional[Decimal] = Field(None, ge=0, decimal_places=2)
+    amount: Optional[Decimal] = Field(None, ge=0)
+    amount_paid: Optional[Decimal] = Field(None, ge=0)
     status: Optional[StatusEnum] = None
     last_partial_payment_date: Optional[date] = None
     branch: Optional[BranchEnum] = None
