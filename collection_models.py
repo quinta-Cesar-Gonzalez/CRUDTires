@@ -95,7 +95,7 @@ class MessageResponse(BaseModel):
 class CompanyResponse(BaseModel):
     """Response for company data."""
     id: int
-    name: str
+    company_name: str
     
     class Config:
         from_attributes = True

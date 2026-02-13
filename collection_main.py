@@ -93,9 +93,8 @@ async def get_enums():
 
 @app.get("/api/companies", response_model=CompaniesListResponse)
 async def get_companies():
-    """Get all companies for selector."""
     try:
-        companies = db.query("SELECT id, name FROM companies ORDER BY name")
+        companies = db.query("SELECT id, company_name FROM companies ORDER BY company_name")
         return CompaniesListResponse(
             success=True,
             data=[CompanyResponse(**company) for company in companies]
