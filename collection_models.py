@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional, Literal
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 
 
@@ -58,8 +58,8 @@ class CollectionResponse(CollectionBase):
     id: int
     outstanding_balance: Decimal
     is_deleted: bool
-    created_at: str
-    last_update: str
+    created_at: datetime
+    last_update: datetime
 
     class Config:
         from_attributes = True
